@@ -13,7 +13,7 @@ class ConsoleUI(AbstractUI):
     if len(options) <= CONSOLE_UI_HEIGHT:
       while True:
         inp = self._print_page(title, options, offset=0)
-        if inp: return inp
+        if inp is not None: return inp
         else:
           self._user_message = "Please enter a valid option"
           continue
@@ -58,7 +58,7 @@ class ConsoleUI(AbstractUI):
       offset = page * CONSOLE_UI_HEIGHT
       items = score_strs[offset:offset + CONSOLE_UI_HEIGHT]
 
-      nav: dict[str, str] = {}
+      nav: dict[str, str] = {'x': "Back"}
       if page < total_pages - 1: nav['+'] = "Next Page"
       if page > 0: nav['-'] = "Prev Page"
 
@@ -74,6 +74,32 @@ class ConsoleUI(AbstractUI):
   def show_message(self, message: str): 
     self._user_message = message
 
+  def collect_players(self, min_players: int = 2) -> list[str]: 
+    names: list[str] = []
+
+    while True:
+      self._clear()
+      self._print_title("Add Players")
+
+      for i, name in enumerate(names):
+        print(self._add_border(f"{i + 1}) {name}"))
+      for _ in range(CONSOLE_UI_HEIGHT - len(names)):
+        print(self._add_border(" "))
+
+      if len(names) >= min_players:
+        self._print_footer(["Leave blank to start"])
+      else: self._print_footer([f"Need at least {min_players} players"])
+
+      raw = self.prompt(f"Player #{len(names) + 1} name: ").strip()
+
+      if not raw:
+        if len(names) < min_players:
+          self._user_message = f"Need at least {min_players} players"
+          continue
+        return names
+      
+      names.append(raw)
+
   def _clear(self) -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -88,14 +114,21 @@ class ConsoleUI(AbstractUI):
     print(CONSOLE_Y_CHAR * CONSOLE_UI_WIDTH)
 
   def _print_footer(self, options: list[str]):
-    pass
+    if len(options) < 1:
+      print(self._add_border(" "))
+    else:
+      print(self._add_border(", ".join(options)))
 
-  def _print_page(self, title: str, items: list, offset: int, nav: dict[str, str] = {}) -> int | None:
+  def _print_page(self, title: str, items: list[str], offset: int, nav: dict[str, str] = {}) -> int | None:
     while True:
       self._clear()
       self._print_title(title)
+
       for i, item in enumerate(items):
         print(self._add_border(f" {i + 1}) {item}"))
+      for _ in range(CONSOLE_UI_HEIGHT - len(items)):
+        print(self._add_border(" "))
+
       self._print_footer([f"{k}) {v}" for k, v in nav.items()])
 
       raw = self.prompt("Option: ").lower()
@@ -105,7 +138,7 @@ class ConsoleUI(AbstractUI):
         return None
 
       if not raw.isdigit():
-        self._user_message = "Please enter a valid option"
+        self._user_message = "Please enter a valid option!!"
         continue
 
       choice = int(raw) - 1
@@ -113,14 +146,18 @@ class ConsoleUI(AbstractUI):
       if 0 <= choice < len(items):
         return offset + choice
       
-      self._user_message = "Please enter a valid option"
+      self._user_message = "Please enter a valid option!"
 
   def _print_scores(self, title: str, items: list[str], offset: int, nav: dict[str, str] = {}) -> None:
     while True:
       self._clear()
       self._print_title(title)
+      
       for score_str in items:
         print(self._add_border(score_str))
+      for _ in range(CONSOLE_UI_HEIGHT - len(items)):
+        print(self._add_border(" "))
+
       self._print_footer([f"{k}) {v}" for k, v in nav.items()])
 
       raw = self.prompt("Option: ").lower()

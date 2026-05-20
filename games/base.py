@@ -11,6 +11,10 @@ class AbstractGame(ABC):
   @abstractmethod
   def game_type(self) -> str: ...
 
+  @property
+  @abstractmethod
+  def min_players(self) -> int: ...
+
   @abstractmethod
   def new_session(self, players: list[Player]) -> GameSession: ...
 
@@ -40,6 +44,9 @@ class AbstractGame(ABC):
 
   @property
   def game_type(self) -> str: ...
+
+  @property
+  def min_players(self) -> int: ...
 
   def new_session(self, players: list[Player]) -> GameSession: ...
 

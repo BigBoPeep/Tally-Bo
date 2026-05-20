@@ -4,7 +4,7 @@ from pathlib import Path
 
 class AbstractSaveBackend(ABC):
   def __init__(self, app_dir: Path) -> None:
-    self._save_dir = app_dir / "storage"
+    self._save_dir = app_dir / "data"
     self._save_dir.mkdir(parents=True, exist_ok=True)
 
   @abstractmethod

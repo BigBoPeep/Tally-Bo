@@ -38,7 +38,7 @@ class AppController:
     idx = self.ui.show_menu("Choose a game", game_names)
     game = available[idx]
 
-    players = self._collect_players()
+    players = self._collect_players(game.min_players)
     if not players:
       return
     
@@ -48,23 +48,9 @@ class AppController:
                          f"{', '.join(p.name for p in players)}")
     self._gameplay_loop(game, session)
 
-  def _collect_players(self) -> list[Player]:
-    players: list[Player] = []
-    
-    while True:
-      prompt = (f"Enter name for Player #{len(players) + 1} "
-                "(or blank to start)")
-      name = self.ui.prompt(prompt).strip()
-
-      if not name:
-        if(len(players) < 2):
-          self.ui.show_message("Need at least 2 players")
-          continue
-        break
-
-      players.append(Player(name=name))
-
-    return players
+  def _collect_players(self, min_players: int = 2) -> list[Player]:
+    names = self.ui.collect_players(min_players)
+    return [Player(name) for name in names]
   
   def _resume_game(self) -> None:
     sessions = self.storage.list_sessions(status="in_progress")

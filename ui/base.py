@@ -13,6 +13,9 @@ class AbstractUI(ABC):
   @abstractmethod
   def show_message(self, message: str): ...
 
+  @abstractmethod
+  def collect_players(self, min_players: int = 2) -> list[str]: ...
+
 '''
 ------------------ New UI Class Boilerplate ------------------
 
@@ -24,4 +27,6 @@ class AbstractUI(ABC):
   def show_scores(self, scores: dict[str, tuple[str, int]]): ...
 
   def show_message(self, message: str): ...
+
+  def collect_players(self, min_players: int = 2) -> list[str]: ...
 '''

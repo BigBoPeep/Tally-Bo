@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from games.base import AbstractGame, GameSession, Turn
 from ui.base import AbstractUI
 from models import Player
+from games import register
 
 class Phase10(AbstractGame):
   def __init__(self) -> None:
@@ -12,6 +13,10 @@ class Phase10(AbstractGame):
 
   @property
   def game_type(self) -> str: return "phase10"
+
+  @property
+  def min_players(self) -> int:
+    return 2
 
   def new_session(self, players: list[Player]) -> GameSession: 
     session = GameSession(game_type=self.game_type, players=players, turns=[], 
@@ -76,3 +81,5 @@ class Phase10(AbstractGame):
       if turn.player_id == player.player_id
       and turn.metadata.get("phase_completed")
     )
+
+register(Phase10())
